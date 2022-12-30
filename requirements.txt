@@ -2,3 +2,4 @@ django
 mysqlclient
 django_mysql
 djangorestframework
+django-webpack-loader

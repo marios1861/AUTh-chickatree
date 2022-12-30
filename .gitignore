@@ -131,3 +131,4 @@ dmypy.json
 # Our settings
 __pycache__/
 migrations/
+node_modules/
