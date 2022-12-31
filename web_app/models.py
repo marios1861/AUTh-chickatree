@@ -9,7 +9,7 @@ from django_mysql.models import SizedTextField, EnumField
 class Profile(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True)
 
     class Genders(models.TextChoices):
         MALE = "male"
