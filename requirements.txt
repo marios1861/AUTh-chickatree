@@ -2,4 +2,5 @@ django
 mysqlclient
 django_mysql
 djangorestframework
+django-cors-headers
 django-webpack-loader
