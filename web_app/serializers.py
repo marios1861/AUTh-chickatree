@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Profile, Tree, Note
+from .models import Profile, Tree, Note, Published_Tree, Review, Change, Bookmark, Comment, Multimedia
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -86,3 +86,78 @@ class NoteSerializer(serializers.ModelSerializer):
             "bookmarks",
             "comments",
         }
+
+class PublishedTreeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Published_Tree
+        fields = {
+            "id",
+            "tree_id",
+            "downloads",
+            "publish_date",
+            "description",
+            "rating",
+            "reviews",
+        }
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = {
+            "author",
+            "published_tree_id",
+            "rating",
+            "review",
+        }
+
+class ChangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Change
+        fields = {
+            "id",
+            "note_id",
+            "author",
+            "difference",
+            "time",
+            "message",
+        }
+
+class BookmarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bookmark
+        fields = {
+            "user",
+            "id",
+            "category",
+        }
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = {
+            "id",
+            "user",
+            "note_id",
+            "comment",
+            "start",
+            "end",
+            "suggestion",
+        }
+
+class MultimediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Multimedia
+        fields = {
+            "id",
+            "note_id",
+            "name",
+            "type",
+            "alt_text",
+            "filename",
+            "directory",
+            "extension",
+            "size",
+        }
+
+
+    
