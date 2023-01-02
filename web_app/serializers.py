@@ -1,26 +1,36 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Profile, Tree, Note, Published_Tree, Review, Change, Bookmark, Comment, Multimedia
+from .models import (
+    Profile,
+    Tree,
+    Note,
+    Published_Tree,
+    Review,
+    Change,
+    Bookmark,
+    Comment,
+    Multimedia,
+)
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ("id", "username", "password")
+        extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data['username'],
-                                        None,
-                                        validated_data['password'])
+        user = User.objects.create_user(
+            validated_data["username"], None, validated_data["password"]
+        )
         return user
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username')
+        fields = ("id", "username")
 
 
 class LoginUserSerializer(serializers.Serializer):
@@ -87,6 +97,7 @@ class NoteSerializer(serializers.ModelSerializer):
             "comments",
         }
 
+
 class PublishedTreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Published_Tree
@@ -100,6 +111,7 @@ class PublishedTreeSerializer(serializers.ModelSerializer):
             "reviews",
         }
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -109,6 +121,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             "rating",
             "review",
         }
+
 
 class ChangeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,14 +135,16 @@ class ChangeSerializer(serializers.ModelSerializer):
             "message",
         }
 
+
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bookmark
         fields = {
             "user",
-            "id",
+            "note_id",
             "category",
         }
+
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -143,6 +158,7 @@ class CommentSerializer(serializers.ModelSerializer):
             "end",
             "suggestion",
         }
+
 
 class MultimediaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -158,6 +174,3 @@ class MultimediaSerializer(serializers.ModelSerializer):
             "extension",
             "size",
         }
-
-
-    

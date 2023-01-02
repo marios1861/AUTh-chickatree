@@ -1,9 +1,18 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework import status, viewsets, permissions, generics
+from rest_framework import status, permissions, generics
 from knox.models import AuthToken
 
-from .models import Tree, Note, Published_Tree, Review, Change, Bookmark, Comment, Multimedia
+from .models import (
+    Tree,
+    Note,
+    Published_Tree,
+    Review,
+    Change,
+    Bookmark,
+    Comment,
+    Multimedia,
+)
 from .serializers import (
     TreeSerializer,
     CreateUserSerializer,
@@ -40,7 +49,9 @@ class RegistrationAPI(generics.GenericAPIView):
 
 
 class UserAPI(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
     serializer_class = UserSerializer
 
     def get_object(self):
@@ -54,10 +65,14 @@ class LoginAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
-        })
+        return Response(
+            {
+                "user": UserSerializer(
+                    user, context=self.get_serializer_context()
+                ).data,
+                "token": AuthToken.objects.create(user)[1],
+            }
+        )
 
 
 @api_view(["GET", "POST "])
@@ -134,7 +149,9 @@ def note_detail(request, pk):
 def published_trees_list(request):
     if request.method == "GET":
         data = Published_Tree.objects.all()
-        serializer = PublishedTreeSerializer(data, context={"request": request}, many=True)
+        serializer = PublishedTreeSerializer(
+            data, context={"request": request}, many=True
+        )
         return Response(serializer.data)
     elif request.method == "POST":
         serializer = PublishedTreeSerializer(data=request.data)
