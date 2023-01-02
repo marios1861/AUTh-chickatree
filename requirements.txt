@@ -3,7 +3,6 @@ mysqlclient
 django_mysql
 djangorestframework
 django-cors-headers
-django-webpack-loader
 django-rest-knox
 knox
 cryptography
