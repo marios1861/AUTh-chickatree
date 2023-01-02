@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,10 +8,13 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { NavLink } from 'react-router-dom';
+import AuthContext from './AuthProvider';
+
 
 function Copyright(props) {
   return (
@@ -29,13 +32,18 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const { registerUser } = useContext(AuthContext);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    registerUser(
+      data.get('username'),
+      data.get('password'),
+      data.get('email'),
+      data.get('firstName'),
+      data.get('lastName'))
+
   };
 
   return (
@@ -83,6 +91,16 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
                   id="email"
                   label="Email Address"
                   name="email"
@@ -117,7 +135,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link variant="body2" component={NavLink} to="../login/">
                   Already have an account? Sign in
                 </Link>
               </Grid>

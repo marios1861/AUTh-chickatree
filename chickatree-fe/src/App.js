@@ -1,22 +1,33 @@
 import React from 'react';
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link as RouterLink
+    Routes,
+    Route,
 } from "react-router-dom";
-import Link from '@mui/material/Link';
-import SignIn from './components/SignInSide.js'
-import Dashboard from './components/Dashboard.js'
-import logo from './logo.svg';
+import Signup from './components/SignUp'
+import SignIn from './components/SignInSide'
+import Dashboard from './components/Dashboard'
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthProvider } from './components/AuthProvider';
 
 function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/login" element={<SignIn />} />
-    </Routes>
-  );
+    return (
+        <AuthProvider>
+            <Routes>
+                <Route path="/"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>} />
+                <Route path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>} />
+                <Route path="/login" element={<SignIn />} />
+                <Route path="/signup" element={<Signup />} />
+            </Routes>
+        </AuthProvider>
+    );
 }
 
 export default App;

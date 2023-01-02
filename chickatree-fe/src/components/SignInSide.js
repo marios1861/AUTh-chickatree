@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,7 +12,8 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, NavLink } from 'react-router-dom';
+import AuthContext from './AuthProvider';
 
 function Copyright(props) {
     return (
@@ -30,13 +31,15 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignInSide() {
+    const { loginUser } = useContext(AuthContext);
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            username: data.get('username'),
-            password: data.get('password'),
-        });
+        loginUser(
+            data.get('username'),
+            data.get('password'),
+        );
     };
 
     return (
@@ -118,7 +121,7 @@ export default function SignInSide() {
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link href="#" variant="body2">
+                                    <Link variant="body2" component={NavLink} to="../signup/">
                                         {"Don't have an account? Sign Up"}
                                     </Link>
                                 </Grid>

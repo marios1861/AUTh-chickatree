@@ -33,6 +33,7 @@ from .serializers import (
 
 class RegistrationAPI(generics.GenericAPIView):
     serializer_class = CreateUserSerializer
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -44,7 +45,8 @@ class RegistrationAPI(generics.GenericAPIView):
                     user, context=self.get_serializer_context()
                 ).data,
                 "token": AuthToken.objects.create(user)[1],
-            }
+            },
+            status=status.HTTP_201_CREATED
         )
 
 
@@ -60,6 +62,7 @@ class UserAPI(generics.RetrieveAPIView):
 
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginUserSerializer
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
