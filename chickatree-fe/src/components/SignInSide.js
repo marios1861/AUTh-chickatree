@@ -12,14 +12,14 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import AuthContext from './AuthProvider';
 
-function Copyright(props) {
+export function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" component={RouterLink} to="/">
+            <Link color="inherit" component={NavLink} to="../">
                 Chickatree
             </Link>{' '}
             {new Date().getFullYear()}
@@ -115,11 +115,6 @@ export default function SignInSide() {
                                 Sign In
                             </Button>
                             <Grid container>
-                                <Grid item xs>
-                                    <Link href="#" variant="body2">
-                                        Forgot password?
-                                    </Link>
-                                </Grid>
                                 <Grid item>
                                     <Link variant="body2" component={NavLink} to="../signup/">
                                         {"Don't have an account? Sign Up"}
