@@ -1,9 +1,11 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status, permissions, generics
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated
 from knox.models import AuthToken
 
 from .models import (
+    Profile,
     Tree,
     Note,
     Published_Tree,
@@ -14,6 +16,7 @@ from .models import (
     Multimedia,
 )
 from .serializers import (
+    ProfileSerializer,
     TreeSerializer,
     CreateUserSerializer,
     UserSerializer,
@@ -46,13 +49,13 @@ class RegistrationAPI(generics.GenericAPIView):
                 ).data,
                 "token": AuthToken.objects.create(user)[1],
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )
 
 
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [
-        permissions.IsAuthenticated,
+        IsAuthenticated,
     ]
     serializer_class = UserSerializer
 
@@ -76,6 +79,43 @@ class LoginAPI(generics.GenericAPIView):
                 "token": AuthToken.objects.create(user)[1],
             }
         )
+
+
+@api_view(["PUT", "DELETE"])
+def profile_detail(request, pk):
+    try:
+        tree = Tree.objects.get(pk=pk)
+    except Tree.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "PUT":
+        serializer = TreeSerializer(
+            tree, data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "DELETE":
+        tree.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def profile_list(request):
+    if request.method == "GET":
+        data = Profile.objects.get(user=request.user)
+        serializer = ProfileSerializer(data, context={"request": request})
+        return Response(serializer.data)
+    elif request.method == "POST":
+        request.data['user'] = request.user
+        serializer = ProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET", "POST "])

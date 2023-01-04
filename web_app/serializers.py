@@ -31,7 +31,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username")
+        fields = ("id", "username", "email", "first_name", "last_name")
 
 
 class LoginUserSerializer(serializers.Serializer):
@@ -48,12 +48,9 @@ class LoginUserSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = {
+        fields = [
             "id",
-            "user.username",
-            "user.email",
-            "user.first_name",
-            "user.last_name",
+            "user",
             "date_of_birth",
             "gender",
             "country",
@@ -61,7 +58,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "profile_image",
             "follower",
             "sees_tree",
-        }
+        ]
 
 
 class TreeSerializer(serializers.ModelSerializer):

@@ -9,6 +9,7 @@ import SignIn from './components/SignInSide';
 import Dashboard, { MainDashboard } from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
+import Profile from './components/Dashboard/Profile';
 import apiClient from './apis/config';
 
 const router = createBrowserRouter([
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <MainDashboard />,
+          },
+          {
+            path: "profile",
+            element: <Profile />
           }
         ]
       },
