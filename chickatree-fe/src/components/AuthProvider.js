@@ -1,20 +1,19 @@
 import { createContext, useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from '../apis/config'
+import { Outlet, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export default AuthContext;
 
 
-export const AuthProvider = ({ children }) => {
-    const [authToken, setAuthToken] = useState(() =>
+export const AuthProvider = ({ apiClient }) => {
+    const [ authToken, setAuthToken ] = useState(() =>
         localStorage.getItem("authToken")
             ? JSON.parse(localStorage.getItem("authToken"))
             : null
     );
 
-    const [user, setUser] = useState(() =>
+    const [ user, setUser ] = useState(() =>
         localStorage.getItem("username")
             ? JSON.parse(localStorage.getItem("username"))
             : null
@@ -28,49 +27,46 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         localStorage.removeItem("authToken");
         localStorage.removeItem("username");
-        navigate("/login");
-    }, [navigate]);
-
-    const validateUser = useCallback(() => {
-        axios.get(`/api/user/${user.id}/`).then((response) => {
-        }).catch((e) => {
-            if (e.response.status === 401) {
-                logoutUser()
-            }
-        })
-    }, [user, logoutUser]);
-
+        navigate("/login", {replace: true});
+    }, [ navigate ]);
 
     useEffect(() => {
         if (authToken) {
-            axios.interceptors.request.use((request) => {
-                request.headers.Authorization = `Token ${authToken}`
+            apiClient.interceptors.request.use((request) => {
+                request.headers.Authorization = `Token ${authToken}`;
                 return request;
             });
+            navigate("/dashboard", {replace: true});
         }
-    }, [authToken]);
+        // eslint-disable-next-line
+    }, [ authToken ]);
 
 
 
     useEffect(() => {
+        const validateUser = () => {
+            apiClient.get(`/api/user/${user.id}/`).catch((e) => {
+                if (e.response.status === 401) {
+                    logoutUser();
+                }
+            });
+        };
         if (user) {
-            validateUser()
+            validateUser();
         }
-    }, [validateUser, user]);
+    });
 
     const loginUser = (username, password) => {
-        axios.post("/api/login/", {
-            method: "POST",
+        apiClient.post("/api/login/", {
             username: username,
             password: password,
         }).then((response) => {
             if (response.status === 200) {
-                const data = response.data
+                const data = response.data;
                 setAuthToken(data.token);
                 setUser(data.user);
                 localStorage.setItem("authToken", JSON.stringify(data.token));
-                localStorage.setItem("username", JSON.stringify(data.user))
-                navigate("/dashboard");
+                localStorage.setItem("username", JSON.stringify(data.user));
             } else {
                 alert("Something went wrong!");
             }
@@ -79,15 +75,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const registerUser = (username, password, email, first_name, last_name) => {
-        axios.post("/api/register/", {
-            method: "POST",
+        apiClient.post("/api/register/", {
             username: username,
             password: password,
             email: email,
             first_name: first_name,
             last_name: last_name
         }).then((response) => {
-            console.log(response)
+            console.log(response);
             if (response.status === 201) {
                 navigate("/login");
             };
@@ -105,8 +100,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={contextData}>
-            {children}
+        <AuthContext.Provider value={ contextData }>
+            <Outlet />
         </AuthContext.Provider>
     );
 };

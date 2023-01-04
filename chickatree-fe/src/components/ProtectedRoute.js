@@ -4,7 +4,7 @@ import AuthContext from "./AuthProvider";
 
 export const ProtectedRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
-  return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute
