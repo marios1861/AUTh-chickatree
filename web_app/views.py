@@ -81,26 +81,6 @@ class LoginAPI(generics.GenericAPIView):
         )
 
 
-@api_view(["PUT", "DELETE"])
-def profile_detail(request, pk):
-    try:
-        tree = Tree.objects.get(pk=pk)
-    except Tree.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "PUT":
-        serializer = TreeSerializer(
-            tree, data=request.data, context={"request": request}
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == "DELETE":
-        tree.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def profile_list(request):
@@ -118,13 +98,36 @@ def profile_list(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
+def profile_detail(request, pk):
+    try:
+        profile = Profile.objects.get(pk=pk)
+    except Profile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "PUT":
+        serializer = ProfileSerializer(
+            profile, data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "DELETE":
+        profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def trees_list(request):
     if request.method == "GET":
-        data = Tree.objects.all()
+        data = Tree.objects.get(user=request.user)
         serializer = TreeSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data[ 'user'] = request.user
         serializer = TreeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -134,6 +137,7 @@ def trees_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def tree_detail(request, pk):
     try:
         tree = Tree.objects.get(pk=pk)
@@ -154,12 +158,14 @@ def tree_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def notes_list(request):
     if request.method == "GET":
-        data = Note.objects.all()
+        data = Note.objects.get(user=request.user)
         serializer = NoteSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.user
         serializer = NoteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -169,6 +175,7 @@ def notes_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def note_detail(request, pk):
     try:
         note = Note.objects.get(pk=pk)
@@ -189,14 +196,16 @@ def note_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def published_trees_list(request):
     if request.method == "GET":
-        data = Published_Tree.objects.all()
+        data = Published_Tree.objects.get(user=request.user)
         serializer = PublishedTreeSerializer(
             data, context={"request": request}, many=True
         )
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.data
         serializer = PublishedTreeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -206,6 +215,7 @@ def published_trees_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def published_tree_detail(request, pk):
     try:
         published_tree = Published_Tree.objects.get(pk=pk)
@@ -226,12 +236,14 @@ def published_tree_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def reviews_list(request):
     if request.method == "GET":
-        data = Review.objects.all()
+        data = Review.objects.get(user=request.user)
         serializer = ReviewSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.data
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -241,6 +253,7 @@ def reviews_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def review_detail(request, pk):
     try:
         review = Review.objects.get(pk=pk)
@@ -261,12 +274,14 @@ def review_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def changes_list(request):
     if request.method == "GET":
-        data = Change.objects.all()
+        data = Change.objects.get(user=request.user)
         serializer = ChangeSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.data
         serializer = ChangeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -276,6 +291,7 @@ def changes_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def change_detail(request, pk):
     try:
         change = Change.objects.get(pk=pk)
@@ -296,12 +312,14 @@ def change_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def bookmarks_list(request):
     if request.method == "GET":
-        data = Bookmark.objects.all()
+        data = Bookmark.objects.get(user=request.user)
         serializer = BookmarkSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.data
         serializer = BookmarkSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -311,6 +329,7 @@ def bookmarks_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def bookmark_detail(request, pk):
     try:
         bookmark = Bookmark.objects.get(pk=pk)
@@ -331,12 +350,14 @@ def bookmark_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def comments_list(request):
     if request.method == "GET":
-        data = Comment.objects.all()
+        data = Comment.objects.get(user=request.user)
         serializer = CommentSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.data
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -346,6 +367,7 @@ def comments_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def comment_detail(request, pk):
     try:
         comment = Comment.objects.get(pk=pk)
@@ -366,12 +388,14 @@ def comment_detail(request, pk):
 
 
 @api_view(["GET", "POST "])
+@permission_classes([IsAuthenticated])
 def multimedia_list(request):
     if request.method == "GET":
-        data = Multimedia.objects.all()
+        data = Multimedia.objects.get(user=request.user)
         serializer = MultimediaSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
+        request.data['user'] = request.data
         serializer = MultimediaSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -381,6 +405,7 @@ def multimedia_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
 def multimedia_detail(request, pk):
     try:
         multimedia = Multimedia.objects.get(pk=pk)
