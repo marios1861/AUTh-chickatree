@@ -163,7 +163,7 @@ class MultimediaSerializer(serializers.ModelSerializer):
         model = Multimedia
         fields = [
             "id",
-            "note_id",
+            "note_id",s
             "name",
             "type",
             "alt_text",
