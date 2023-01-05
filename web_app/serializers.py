@@ -64,19 +64,19 @@ class ProfileSerializer(serializers.ModelSerializer):
 class TreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tree
-        fields = {
+        fields = [
             "id",
             "title",
             "owner",
             "image",
             "color",
-        }
+        ]
 
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = {
+        fields = [
             "id",
             "tree_id",
             "parent_id",
@@ -93,13 +93,13 @@ class NoteSerializer(serializers.ModelSerializer):
             "changes",
             "bookmarks",
             "comments",
-        }
+        ]
 
 
 class PublishedTreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Published_Tree
-        fields = {
+        fields = [
             "id",
             "tree_id",
             "downloads",
@@ -107,47 +107,47 @@ class PublishedTreeSerializer(serializers.ModelSerializer):
             "description",
             "rating",
             "reviews",
-        }
+        ]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = {
+        fields = [
             "author",
             "published_tree_id",
             "rating",
             "review",
-        }
+        ]
 
 
 class ChangeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Change
-        fields = {
+        fields = [
             "id",
             "note_id",
             "author",
             "difference",
             "time",
             "message",
-        }
+        ]
 
 
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bookmark
-        fields = {
+        fields = [
             "user",
             "note_id",
             "category",
-        }
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = {
+        fields = [
             "id",
             "user",
             "note_id",
@@ -155,13 +155,13 @@ class CommentSerializer(serializers.ModelSerializer):
             "start",
             "end",
             "suggestion",
-        }
+        ]
 
 
 class MultimediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Multimedia
-        fields = {
+        fields = [
             "id",
             "note_id",
             "name",
@@ -171,4 +171,4 @@ class MultimediaSerializer(serializers.ModelSerializer):
             "directory",
             "extension",
             "size",
-        }
+        ]
