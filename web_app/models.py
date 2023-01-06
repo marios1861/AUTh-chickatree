@@ -19,7 +19,7 @@ class Profile(models.Model):
     gender = models.CharField(max_length=6, choices=Genders.choices)
     country = models.CharField(max_length=45)
     city = models.CharField(max_length=45)
-    profile_image = SizedTextField(1)
+    profile_image = SizedTextField(1, null=True)
     sees_tree = models.ManyToManyField("Tree", related_name="seen_by")
     follower = models.ManyToManyField(
         "self", related_name="followed", symmetrical=False

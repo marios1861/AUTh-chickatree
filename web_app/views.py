@@ -53,7 +53,7 @@ class RegistrationAPI(generics.GenericAPIView):
         )
 
 
-class UserAPI(generics.RetrieveAPIView):
+class UserAPI(generics.RetrieveUpdateAPIView):
     permission_classes = [
         IsAuthenticated,
     ]
@@ -61,6 +61,14 @@ class UserAPI(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        serializer = UserSerializer(
+            self.request.user, data=request.data, context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LoginAPI(generics.GenericAPIView):
@@ -89,7 +97,7 @@ def profile_list(request):
         serializer = ProfileSerializer(data, context={"request": request})
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.user
+        request.data["user"] = request.user
         serializer = ProfileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -102,13 +110,13 @@ def profile_list(request):
 @permission_classes([IsAuthenticated])
 def profile_detail(request, pk):
     try:
-        profile = Profile.objects.get(pk=pk)
+        profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PUT":
         serializer = ProfileSerializer(
-            profile, data=request.data, context={"request": request}
+            profile, data=request.data, context={"request": request}, partial=True
         )
         if serializer.is_valid():
             serializer.save()
@@ -127,7 +135,7 @@ def trees_list(request):
         serializer = TreeSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data[ 'user'] = request.user
+        request.data["user"] = request.user
         serializer = TreeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -165,7 +173,7 @@ def notes_list(request):
         serializer = NoteSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.user
+        request.data["user"] = request.user
         serializer = NoteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -205,7 +213,7 @@ def published_trees_list(request):
         )
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.data
+        request.data["user"] = request.data
         serializer = PublishedTreeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -243,7 +251,7 @@ def reviews_list(request):
         serializer = ReviewSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.data
+        request.data["user"] = request.data
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -281,7 +289,7 @@ def changes_list(request):
         serializer = ChangeSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.data
+        request.data["user"] = request.data
         serializer = ChangeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -319,7 +327,7 @@ def bookmarks_list(request):
         serializer = BookmarkSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.data
+        request.data["user"] = request.data
         serializer = BookmarkSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -357,7 +365,7 @@ def comments_list(request):
         serializer = CommentSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.data
+        request.data["user"] = request.data
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -395,7 +403,7 @@ def multimedia_list(request):
         serializer = MultimediaSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data['user'] = request.data
+        request.data["user"] = request.data
         serializer = MultimediaSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

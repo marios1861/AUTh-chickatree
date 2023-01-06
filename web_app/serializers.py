@@ -22,8 +22,11 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            validated_data["username"], validated_data["email"], validated_data["password"],
-            first_name=validated_data["first_name"], last_name=validated_data["last_name"]
+            validated_data["username"],
+            validated_data["email"],
+            validated_data["password"],
+            first_name=validated_data["first_name"],
+            last_name=validated_data["last_name"],
         )
         return user
 
@@ -59,6 +62,11 @@ class ProfileSerializer(serializers.ModelSerializer):
             "follower",
             "sees_tree",
         ]
+        extra_kwargs = {
+            "profile_image": {"required": False},
+            "follower": {"required": False},
+            "sees_tree": {"required": False},
+        }
 
 
 class TreeSerializer(serializers.ModelSerializer):
@@ -163,7 +171,7 @@ class MultimediaSerializer(serializers.ModelSerializer):
         model = Multimedia
         fields = [
             "id",
-            "note_id",s
+            "note_id",
             "name",
             "type",
             "alt_text",
