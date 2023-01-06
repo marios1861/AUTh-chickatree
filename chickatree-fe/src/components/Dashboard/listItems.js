@@ -21,7 +21,7 @@ export const MainListItems = () => {
       </ListItemIcon>
       <ListItemText primary="Profile" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton onClick={() => navigate("trees")}>
       <ListItemIcon>
         <ParkIcon />
       </ListItemIcon>

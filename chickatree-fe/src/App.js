@@ -1,8 +1,7 @@
 import React from 'react';
-import
-{
-  Navigate,
-  createBrowserRouter
+import {
+Navigate,
+createBrowserRouter
 } from "react-router-dom";
 import SignUp from './components/SignUp';
 import SignIn from './components/SignInSide';
@@ -10,11 +9,12 @@ import Dashboard, { MainDashboard } from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
 import Profile from './components/Dashboard/Profile';
+import Tree from './components/Dashboard/Tree';
 import apiClient from './apis/config';
 
 const router = createBrowserRouter([
   {
-    element: <AuthProvider apiClient={apiClient} />,
+    element: <AuthProvider apiClient={ apiClient } />,
     children: [
       {
         path: "/",
@@ -34,6 +34,10 @@ const router = createBrowserRouter([
           {
             path: "profile",
             element: <Profile />
+          },
+          {
+            path: "trees",
+            element: <Tree />
           }
         ]
       },
