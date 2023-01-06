@@ -8,6 +8,7 @@ import AuthContext from '../AuthProvider';
 import Button from '@mui/material/Button';
 import { Divider } from '@mui/material';
 import ProfileEdit from './Profile/ProfileEdit';
+import { red } from '@mui/material/colors';
 
 const theme = createTheme({
   palette: {
@@ -17,32 +18,61 @@ const theme = createTheme({
   },
 });
 
+function reducer(state, action) {
+  switch (action.type) {
+    case 'load': {
+      return {
+        profileData: action.profileData,
+        editProfile: state.editProfile,
+      };
+    }
+    case 'edit': {
+      return {
+        editProfile: true,
+        profileData: state.profileData,
+      };
+    }
+    case 'save': {
+      return {
+        profileData: action.profileData,
+        editProfile: false,
+      };
+    }
+    default: {
+      throw Error('Unknown profile action');
+    }
+
+  }
+}
 
 const Profile = () => {
-  const [ profileData, setProfileData ] = React.useState(null);
-  const { user, useApi } = React.useContext(AuthContext);
-  const [ editProfile, setEditProfile ] = React.useState(false);
+  const { user, useApi, logoutUser } = React.useContext(AuthContext);
+  const [ state, dispatch ] = React.useReducer(
+    reducer, { profileData: null, editProfile: false });
+
   const apiClient = useApi();
   React.useEffect(() => {
     apiClient.get("api/profile/").then((response) => {
-      setProfileData(response.data);
+      dispatch({
+        type: "load",
+        profileData: response.data
+      });
     }).catch((error) => {
       console.log(error);
     });
-    return setProfileData(null)
-  }, [apiClient, user]);
+  }, [ apiClient ]);
 
   let items = [];
-  if (profileData) {
+  if (state.profileData) {
     items = [
-      [ "Username", user.username, 'username', user.id, profileData.id ],
+      [ "Username", user.username, 'username', user.id, state.profileData.id ],
       [ "Email", user.email, 'email' ],
       [ "Name", `${user.first_name} ${user.last_name}`,
         user.first_name, user.last_name, 'first_name', 'last_name', "First Name", "Last Name" ],
-      [ "Date of Birth", profileData.date_of_birth, 'date_of_birth' ],
-      [ "Gender", profileData.gender, 'gender' ],
-      [ "Location", `${profileData.city}, ${profileData.country}`,
-        profileData.city, profileData.country, 'city', 'country', "City", "Country" ],
+      [ "Date of Birth", state.profileData.date_of_birth, 'date_of_birth' ],
+      [ "Gender", state.profileData.gender, 'gender' ],
+      [ "Location", `${state.profileData.city}, ${state.profileData.country}`,
+        state.profileData.city, state.profileData.country, 'city', 'country', "City", "Country" ],
     ];
   }
 
@@ -50,21 +80,22 @@ const Profile = () => {
     <Container maxWidth="lg" sx={ { mt: 4, mb: 4 } }>
       <Grid container spacing={ 3 }>
         <Grid item xs={ 12 }>
-          { profileData
+          { state.profileData
             ? <Paper
               elevation={ 2 }
               sx={ {
                 p: 3,
               } } >
-              { editProfile
+              { state.editProfile
                 ? <ProfileEdit
                   items={ items }
                   apiClient={ apiClient }
-                  setEditProfile={ setEditProfile }
-                  setProfileData={ setProfileData } />
+                  dispatch={ dispatch }
+                  user={ user }
+                  logout={ logoutUser } />
                 : <ProfileDetails
                   items={ items }
-                  setEditProfile={ setEditProfile } /> }
+                  dispatch={ dispatch } /> }
             </Paper>
             : null }
         </Grid>
@@ -73,7 +104,7 @@ const Profile = () => {
   );
 };
 
-const ProfileDetails = ({ items, setEditProfile }) => {
+const ProfileDetails = ({ items, dispatch }) => {
 
   const componentItems = items.map(([ first, second, ...rest ], index) => {
     return (
@@ -98,7 +129,7 @@ const ProfileDetails = ({ items, setEditProfile }) => {
       >
         <Button
           variant="outlined"
-          onClick={ () => setEditProfile(true) }>
+          onClick={ () => dispatch({ type: 'edit' }) }>
           Edit Profile
         </Button>
       </Grid>

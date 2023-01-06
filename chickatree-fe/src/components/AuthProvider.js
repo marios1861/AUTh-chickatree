@@ -88,35 +88,33 @@ export const AuthProvider = ({ apiClient }) => {
 
   const useApi = () => {
     apiClient.interceptors.request.use((request) => {
-        request.headers.Authorization = `Token ${authToken}`;
-        return request;
+      request.headers.Authorization = `Token ${authToken}`;
+      return request;
     });
     return apiClient;
-};
+  };
 
   useEffect(() => {
     if (user) {
-        const interceptor = apiClient.interceptors.request.use((request) => {
-            request.headers.Authorization = `Token ${authToken}`;
-            return request;
+      const interceptor = apiClient.interceptors.request.use((request) => {
+        request.headers.Authorization = `Token ${authToken}`;
+        return request;
+      });
+      apiClient.get(`/api/user/${user.id}/`)
+        .catch((e) => {
+          if (e.response.status === 401) {
+            logoutUser();
+          }
         });
-        apiClient.get(`/api/user/${user.id}/`)
-            .catch((e) => {
-                if (e.response.status === 401) {
-                    logoutUser();
-                }
-            });
-        return apiClient.interceptors.request.eject(interceptor)
+      return apiClient.interceptors.request.eject(interceptor);
     }
-});
+  });
 
 
   const contextData = {
     useApi,
     user,
-    setUser,
     authToken,
-    setAuthToken,
     registerUser,
     loginUser,
     logoutUser,

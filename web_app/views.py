@@ -108,7 +108,7 @@ def profile_list(request):
 
 @api_view(["PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
-def profile_detail(request, pk):
+def profile_detail(request):
     try:
         profile = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:

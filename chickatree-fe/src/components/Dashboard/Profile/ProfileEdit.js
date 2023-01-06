@@ -6,7 +6,15 @@ import dayjs from "dayjs";
 import React from "react";
 import { Box } from "@mui/system";
 
-export default function ProfileEdit({ items, apiClient, setEditProfile, setProfileData }) {
+function deepEqual(x, y) {
+  return (x && y && typeof x === 'object' && typeof y === 'object') ?
+    (Object.keys(x).length === Object.keys(y).length) &&
+    Object.keys(x).reduce(function (isEqual, key) {
+      return isEqual && deepEqual(x[ key ], y[ key ]);
+    }, true) : (x === y);
+}
+
+export default function ProfileEdit({ items, apiClient, dispatch, user, logout }) {
   const genderChoices = [ 'male', 'female', 'other' ];
   const [ formState, setFormState ] = React.useState(
     {
@@ -18,20 +26,36 @@ export default function ProfileEdit({ items, apiClient, setEditProfile, setProfi
   const handleEdit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
     const profileData = {
       city: data.get('city'),
       country: data.get('country'),
       date_of_birth: dayjs(data.get('date_of_birth')).format('YYYY-MM-DD'),
       gender: genderChoices[ data.get('gender') ],
     };
+    const userData = {
+      id: items[ 0 ][ 3 ],
+      username: data.get('username'),
+      email: data.get('email'),
+      first_name: data.get('first_name'),
+      last_name: data.get('last_name'),
+    };
+
     apiClient
-      .put(`api/profile/${items[ 0 ][ 4 ]}/`,
-        profileData)
-      .then((response) => { console.log(response); })
+      .put('api/profile/update/', profileData)
       .catch((err) => console.log(err));
-    console.log([ ...data.entries() ]);
-    setProfileData(profileData);
-    setEditProfile(false);
+    apiClient
+      .put(`api/user/${items[ 0 ][ 3 ]}/`, userData)
+      .catch((err) => console.log(err));
+    if (deepEqual(userData, user)) {
+      dispatch(
+        {
+          type: "save",
+          profileData: profileData,
+        });
+    } else {
+      logout();
+    }
   };
   let formItems = items.map((item, index) => {
     if (item[ 0 ] === "Name" || item[ 0 ] === "Location") {
@@ -90,7 +114,7 @@ export default function ProfileEdit({ items, apiClient, setEditProfile, setProfi
               name={ item[ 2 ] }
               select
               label={ item[ 0 ] }
-              value={ formState.gender === -1 ? 0 : formState.gender}
+              value={ formState.gender === -1 ? 0 : formState.gender }
               onChange={ (event) => {
                 setFormState(
                   prevState => ({

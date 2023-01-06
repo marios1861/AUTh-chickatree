@@ -31,7 +31,7 @@ urlpatterns = [
     path("login/", LoginAPI.as_view()),
     path("user/<int:pk>/", UserAPI.as_view()),
     path("profile/", profile_list),
-    path("profile/<int:pk>/", profile_detail),
+    path("profile/update/", profile_detail),
     path("tree/", trees_list),
     path("tree/<int:pk>/", tree_detail),
     path("note/", notes_list),
