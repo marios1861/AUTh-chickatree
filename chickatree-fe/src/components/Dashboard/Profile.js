@@ -8,7 +8,6 @@ import AuthContext from '../AuthProvider';
 import Button from '@mui/material/Button';
 import { Divider } from '@mui/material';
 import ProfileEdit from './Profile/ProfileEdit';
-import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
@@ -21,9 +20,9 @@ const theme = createTheme({
 
 const Profile = () => {
   const [ profileData, setProfileData ] = React.useState(null);
-  const { user, apiClient } = React.useContext(AuthContext);
+  const { user, useApi } = React.useContext(AuthContext);
   const [ editProfile, setEditProfile ] = React.useState(false);
-  const navigate = useNavigate();
+  const apiClient = useApi();
   React.useEffect(() => {
     apiClient.get("api/profile/").then((response) => {
       setProfileData(response.data);

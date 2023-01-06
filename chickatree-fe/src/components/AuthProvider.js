@@ -86,34 +86,33 @@ export const AuthProvider = ({ apiClient }) => {
       .catch((e) => console.log(e));
   };
 
-  useEffect(() => {
-    if (user) {
-      const validateUser = () => {
-        apiClient.get(`/api/user/${user.id}/`).catch(
-          (error) => {
-            if (error.response.status === 401) {
-              logoutUser();
-            }
-          });
-      };
-
-      const reqInterceptor = request => {
+  const useApi = () => {
+    apiClient.interceptors.request.use((request) => {
         request.headers.Authorization = `Token ${authToken}`;
         return request;
-      };
+    });
+    return apiClient;
+};
 
-      const interceptor = apiClient.interceptors.request.use(reqInterceptor);
-      validateUser();
-
-      return () => {
-        apiClient.interceptors.request.eject(interceptor);
-      };
+  useEffect(() => {
+    if (user) {
+        const interceptor = apiClient.interceptors.request.use((request) => {
+            request.headers.Authorization = `Token ${authToken}`;
+            return request;
+        });
+        apiClient.get(`/api/user/${user.id}/`)
+            .catch((e) => {
+                if (e.response.status === 401) {
+                    logoutUser();
+                }
+            });
+        return apiClient.interceptors.request.eject(interceptor)
     }
-  });
+});
 
 
   const contextData = {
-    apiClient,
+    useApi,
     user,
     setUser,
     authToken,
