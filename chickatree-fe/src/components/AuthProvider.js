@@ -1,40 +1,76 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useReducer, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export default AuthContext;
 
+function reducer(state, action) {
+  switch (action.type) {
+    case 'login':
+      return {
+        token: action.token,
+        user: action.user
+      };
+    case 'logout':
+      return {
+        token: null,
+        user: null
+      };
+    default:
+      throw Error('Unknown authprovider action');
+  }
+}
 
 export const AuthProvider = ({ apiClient }) => {
 
   // this variable stores the authToken
-  const [ authToken, setAuthToken ] = useState(() =>
-    localStorage.getItem("authToken")
-      ? JSON.parse(localStorage.getItem("authToken"))
-      : null
-  );
-
-  // this variable stores the user object (properties: id, username)
-  const [ user, setUser ] = useState(() =>
-    localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user"))
-      : null
-  );
+  const navigate = useNavigate();
+  const [ state, dispatch ] = useReducer(
+    reducer,
+    {
+      user: null,
+      token: null
+    },
+    (initArgs) => {
+      let saved_state = localStorage.getItem("state");
+      if (saved_state) {
+        saved_state = JSON.parse(saved_state);
+        apiClient.interceptors.request.use((request) => {
+          request.headers.Authorization = `Token ${saved_state.token}`;
+          return request;
+        });
+        apiClient.get(`/api/user/${saved_state.user.id}/`)
+          .catch((e) => {
+            if (e.response.status === 401) {
+              logoutUser();
+            }
+          });
+        return {
+          token: saved_state.token,
+          user: saved_state.user,
+        };
+      }
+      else {
+        return {
+          token: null,
+          user: null
+        };
+      }
+    });
 
   // this variable stores the state of the application (loading data or not)
   const [ loading, setLoading ] = useState(false);
 
   // this is used to navigate to different pages
-  const navigate = useNavigate();
 
   // call this function to sign out logged in user
   const logoutUser = () => {
     // reset state and delete stored values
-    setAuthToken(null);
-    setUser(null);
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+    dispatch({
+      type: 'logout'
+    });
+    localStorage.removeItem("state");
     apiClient.interceptors.request.clear();
     // navigate to login page
     navigate("/login", { replace: true });
@@ -53,10 +89,19 @@ export const AuthProvider = ({ apiClient }) => {
         if (response.status === 200) {
           const data = response.data;
           // save received data and update state
-          setAuthToken(data.token);
-          setUser(data.user);
-          localStorage.setItem("authToken", JSON.stringify(data.token));
-          localStorage.setItem("user", JSON.stringify(data.user));
+          apiClient.interceptors.request.use((request) => {
+            request.headers.Authorization = `Token ${data.token}`;
+            return request;
+          });
+          dispatch({
+            type: 'login',
+            token: data.token,
+            user: data.user,
+          });
+          localStorage.setItem("state", JSON.stringify({
+            token: data.token,
+            user: data.user
+          }));
           // stop loading
           setLoading(false);
           // navigate to main page
@@ -86,35 +131,9 @@ export const AuthProvider = ({ apiClient }) => {
       .catch((e) => console.log(e));
   };
 
-  const useApi = () => {
-    apiClient.interceptors.request.use((request) => {
-      request.headers.Authorization = `Token ${authToken}`;
-      return request;
-    });
-    return apiClient;
-  };
-
-  useEffect(() => {
-    if (user) {
-      const interceptor = apiClient.interceptors.request.use((request) => {
-        request.headers.Authorization = `Token ${authToken}`;
-        return request;
-      });
-      apiClient.get(`/api/user/${user.id}/`)
-        .catch((e) => {
-          if (e.response.status === 401) {
-            logoutUser();
-          }
-        });
-      return apiClient.interceptors.request.eject(interceptor);
-    }
-  });
-
-
   const contextData = {
-    useApi,
-    user,
-    authToken,
+    apiClient,
+    user: state.user,
     registerUser,
     loginUser,
     logoutUser,
