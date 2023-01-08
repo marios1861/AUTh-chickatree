@@ -64,7 +64,10 @@ class UserAPI(generics.RetrieveUpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         serializer = UserSerializer(
-            self.request.user, data=request.data, context=self.get_serializer_context()
+            self.request.user,
+            data=request.data,
+            context=self.get_serializer_context(),
+            partial=True,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()

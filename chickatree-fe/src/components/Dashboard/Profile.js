@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
+import Grid2 from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import { createTheme } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
@@ -8,7 +9,7 @@ import AuthContext from '../AuthProvider';
 import Button from '@mui/material/Button';
 import { Divider } from '@mui/material';
 import ProfileEdit from './Profile/ProfileEdit';
-import { red } from '@mui/material/colors';
+import ProfileAvatar from './Profile/ProfileAvatar';
 
 const theme = createTheme({
   palette: {
@@ -46,11 +47,10 @@ function reducer(state, action) {
 }
 
 const Profile = () => {
-  const { user, useApi, logoutUser } = React.useContext(AuthContext);
+  const { user, apiClient, logoutUser } = React.useContext(AuthContext);
   const [ state, dispatch ] = React.useReducer(
     reducer, { profileData: null, editProfile: false });
 
-  const apiClient = useApi();
   React.useEffect(() => {
     apiClient.get("api/profile/").then((response) => {
       dispatch({
@@ -65,7 +65,6 @@ const Profile = () => {
   let items = [];
   if (state.profileData) {
     items = [
-      [ "Username", user.username, 'username', user.id, state.profileData.id ],
       [ "Email", user.email, 'email' ],
       [ "Name", `${user.first_name} ${user.last_name}`,
         user.first_name, user.last_name, 'first_name', 'last_name', "First Name", "Last Name" ],
@@ -77,14 +76,26 @@ const Profile = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={ { mt: 4, mb: 4 } }>
-      <Grid container spacing={ 3 }>
-        <Grid item xs={ 12 }>
-          { state.profileData
-            ? <Paper
+    <Container maxWidth="xl" sx={ { mt: 4, mb: 4 } }>
+      { state.profileData ?
+        <Grid2 container spacing={ 3 } sx={ { alignItems: "stretch" } }>
+          <Grid2 xs={ 4 } display="flex" alignItems="stretch">
+            <Paper
               elevation={ 2 }
               sx={ {
-                p: 3,
+                flexGrow: 1,
+                borderRadius: '30px',
+              } } >
+              <ProfileAvatar
+                image={ state.profileData.profile_image }
+                user={ user } />
+            </Paper>
+          </Grid2>
+          <Grid2 xs={ 8 } display="flex" alignItems="stretch">
+            <Paper
+              elevation={ 2 }
+              sx={ {
+                borderRadius: '30px',
               } } >
               { state.editProfile
                 ? <ProfileEdit
@@ -97,9 +108,9 @@ const Profile = () => {
                   items={ items }
                   dispatch={ dispatch } /> }
             </Paper>
-            : null }
-        </Grid>
-      </Grid>
+          </Grid2>
+        </Grid2>
+        : null }
     </Container>
   );
 };
@@ -108,49 +119,58 @@ const ProfileDetails = ({ items, dispatch }) => {
 
   const componentItems = items.map(([ first, second, ...rest ], index) => {
     return (
-      <React.Fragment key={ index }>
-        <ProfileRow
-          first={ first }
-          second={ second } />
-        <Grid item xs={ 12 }><Divider /></Grid>
-      </React.Fragment>
-
+      <ProfileRow
+        first={ first }
+        second={ second }
+        key={ index * 2 } />
+    );
+  });
+  let dividedItems = [];
+  componentItems.forEach((element, index) => {
+    dividedItems.push(element);
+    dividedItems.push(
+      <Grid2 key={ index * 2 + 1 } xs={ 12 }><Divider /></Grid2>
     );
   });
   return (
-    <Grid
+    <Grid2
       container
-      rowSpacing={ 2 }>
-      { componentItems }
-      <Grid
-        item
+      justifyContent="center"
+      alignItems="center"
+      sx={ { p: "24px" } }>
+      { dividedItems }
+      <Grid2
+        container
+        justifyContent="center"
+        alignItems="center"
         xs={ 12 }
-        sx={ { textAlign: "center" } }
-      >
+        sx={ { height: 80 } }>
         <Button
           variant="outlined"
           onClick={ () => dispatch({ type: 'edit' }) }>
           Edit Profile
         </Button>
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   );
 };
 
 const ProfileRow = ({ first, second }) => {
   return (
-    <>
-      <Grid item xs={ 6 }>
-        <Typography>
+    <Grid2 container xs={ 12 }>
+      <Grid2 xs={ 6 }>
+        <Typography
+          variant="h6">
           { first }
         </Typography>
-      </Grid>
-      <Grid item xs={ 6 }>
-        <Typography>
+      </Grid2>
+      <Grid2 alignItems="center" display="flex" xs={ 6 }>
+        <Typography
+          noWrap>
           { second }
         </Typography>
-      </Grid>
-    </>
+      </Grid2>
+    </Grid2>
   );
 };
 

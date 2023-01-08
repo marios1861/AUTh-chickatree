@@ -1,4 +1,4 @@
-import { Grid, TextField, Divider, Button, MenuItem } from "@mui/material";
+import { Unstable_Grid2 as Grid, TextField, Divider, Button, MenuItem } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -18,9 +18,11 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
   const genderChoices = [ 'male', 'female', 'other' ];
   const [ formState, setFormState ] = React.useState(
     {
-      date: items[ 3 ][ 1 ],
-      gender: genderChoices.findIndex((item) => item === items[ 4 ][ 1 ]),
-    });
+      date: items.find(element => element[ 0 ] === "Date of Birth")[1],
+      gender: genderChoices.findIndex(
+        (item) => item === items.find(element => element[ 0 ] === "Gender")[1]),
+    }
+  );
 
 
   const handleEdit = (event) => {
@@ -34,36 +36,40 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
       gender: genderChoices[ data.get('gender') ],
     };
     const userData = {
-      id: items[ 0 ][ 3 ],
-      username: data.get('username'),
+      id: user.id,
+      username: user.username,
       email: data.get('email'),
       first_name: data.get('first_name'),
       last_name: data.get('last_name'),
     };
-
-    apiClient
-      .put('api/profile/update/', profileData)
-      .catch((err) => console.log(err));
-    apiClient
-      .put(`api/user/${items[ 0 ][ 3 ]}/`, userData)
-      .catch((err) => console.log(err));
     if (deepEqual(userData, user)) {
       dispatch(
         {
           type: "save",
           profileData: profileData,
         });
+      apiClient
+        .put('api/profile/update/', profileData)
+        .catch((err) => console.log(err));
     } else {
+      apiClient
+        .put(`api/user/${user.id}/`, userData)
+        .catch((err) => console.log(err));
+      apiClient
+        .put('api/profile/update/', profileData)
+        .catch((err) => console.log(err));
       logout();
     }
   };
   let formItems = items.map((item, index) => {
     if (item[ 0 ] === "Name" || item[ 0 ] === "Location") {
       return (
-        <React.Fragment
+        <Grid
+          container
+          xs = { 12 }
           key={ index }>
+          { item[ 0 ] === "Location" && <Grid xs={ 12 }><Divider /></Grid> }
           <Grid
-            item
             xs={ 6 }>
             <TextField
               name={ item[ 4 ] }
@@ -72,7 +78,6 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
               defaultValue={ item[ 2 ] } />
           </Grid>
           <Grid
-            item
             xs={ 6 }>
             <TextField
               name={ item[ 5 ] }
@@ -80,16 +85,17 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
               label={ item[ 7 ] }
               defaultValue={ item[ 3 ] } />
           </Grid>
-          <Grid item xs={ 12 }><Divider /></Grid>
-        </React.Fragment>
+          <Grid xs={ 12 }><Divider /></Grid>
+        </Grid>
       );
     }
-    else if (item[ 0 ] === "Username" || item[ 0 ] === "Email") {
+    else if (item[ 0 ] === "Email") {
       return (
-        <React.Fragment
+        <Grid
+          container
+          xs={ 12 }
           key={ index }>
           <Grid
-            item
             xs={ 6 }>
             <TextField
               name={ item[ 2 ] }
@@ -98,16 +104,16 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
               defaultValue={ item[ 1 ] }
             />
           </Grid>
-          { item[ 0 ] === "Email" ? <Grid item xs={ 12 }><Divider /></Grid> : null }
-        </React.Fragment>
+          <Grid xs={ 12 }><Divider /></Grid>
+        </Grid>
       );
     }
     else if (item[ 0 ] === "Gender") {
       return (
-        <React.Fragment
+        <Grid
+          container
           key={ index }>
           <Grid
-            item
             xs={ 6 }>
             <TextField
               id={ item[ 2 ] }
@@ -134,15 +140,13 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
               </MenuItem>
             </TextField>
           </Grid>
-          <Grid item xs={ 12 }><Divider /></Grid>
-        </React.Fragment>
+        </Grid>
       );
     }
     else if (item[ 0 ] === "Date of Birth") {
       return (
         <Grid
           key={ index }
-          item
           xs={ 6 }>
           <LocalizationProvider dateAdapter={ AdapterDayjs }>
             <DatePicker
@@ -174,10 +178,10 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
       onSubmit={ handleEdit }>
       <Grid
         container
-        rowSpacing={ 3 } >
+        rowSpacing={ 3 }
+        sx={{m: 0}} >
         { formItems }
         <Grid
-          item
           xs={ 12 }
           sx={ { textAlign: "center" } }
         >
