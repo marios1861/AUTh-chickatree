@@ -1,53 +1,70 @@
-import {useState, useMemo} from 'react';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import { useReducer } from 'react';
 import uuid from 'react-uuid';
-import './Note.css';
 import Main from './Note/Main';
 import Sidebar from './Note/Sidebar';
 
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "add":
+      return {
+        list: [newNote(), ...state.list],
+        activeNoteId: state.activeNoteId
+
+      };
+
+    case "update": {
+      return {
+        list:
+          state
+            .list
+            .filter((note) => note.id !== state.activeNoteId)
+            .concat([action.updatedNote]),
+        activeNoteId: state.activeNoteId
+
+      };
+    }
+
+    case "delete":
+      return {
+        list: state.list.filter((note) => note.id !== action.id),
+        activeNoteId: state.activeNoteId
+      };
+
+    case "activate": {
+      return {
+        list: state.list,
+        activeNoteId: action.id
+      };
+    }
+    default: {
+      throw Error('Unknown profile action');
+    }
+  }
+}
+
+
 const newNote = () => {
-  return { id: uuid(),
-   title:"",
-   body: "",
-   lastModified: Date.now()}
- };
+  return {
+    id: uuid(),
+    title: "",
+    body: "",
+    lastModified: Date.now()
+  };
+};
 
 export default function Note() {
-  const [notes, setNotes] = useState([]);
-  const [filterednotes, setFilteredNotes] = useState([]);
-  const [activeNote, setActiveNote] = useState(false);
-  
-
-  // Add a new note
-  const onAddNote = () => {
-    
-
-    // update the list of notes
-    setNotes([newNote(), ...notes]);
-  };
-
-  const onUpdateNote = (updatedNote) => {
-    const updatedNotesArray = notes.map((note) => {
-      if(note.id === activeNote) {
-        return updatedNote;
-      }
-      return note;
-    });
-    
-    setNotes(updatedNotesArray);
-  }
-
-  const onDeleteNote = (idToDelete) => {
-     setNotes(notes.filter((note) => note.id !== idToDelete))
-  }
-
-  const getActiveNote = () => {
-    return notes.find((note) => note.id === activeNote);
-  }
+  const [state, dispatch] = useReducer(reducer, { activeNoteId: false, list: [] });
 
   return (
-    <div className="App">
-     <Sidebar notes={notes} setNotes={setNotes} onAddNote={onAddNote} onDeleteNote={onDeleteNote} activeNote={activeNote} setActiveNote={setActiveNote}  filterednotes={filterednotes} setFilteredNotes={setFilteredNotes}/>
-     <Main activeNote={getActiveNote()} onUpdateNote={onUpdateNote} />
-    </div>
-  )
+    <Grid container display="flex" spacing={ 3 } alignItems="stretch" sx={{m: 4, height: "100%"}} flexWrap="nowrap">
+      <Grid xs={ 4 } container sx={{m:0}}>
+        <Sidebar noteState={ state } dispatch={ dispatch } />
+      </Grid>
+      <Grid xs={ 8 } container sx={{m:0}}>
+        <Main activeNote={ state.list.find((note) => note.id === state.activeNoteId) } dispatch={ dispatch } />
+      </Grid>
+    </Grid>
+  );
 }

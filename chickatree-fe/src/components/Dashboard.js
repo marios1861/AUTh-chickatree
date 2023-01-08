@@ -30,14 +30,14 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create([ 'width', 'margin' ], {
+  transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create([ 'width', 'margin' ], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -62,7 +62,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
           duration: theme.transitions.duration.leavingScreen,
         }),
         width: theme.spacing(7),
-        [ theme.breakpoints.up('sm') ]: {
+        [theme.breakpoints.up('sm')]: {
           width: theme.spacing(9),
         },
       }),
@@ -73,16 +73,16 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const mdTheme = createTheme({
   palette: {
     primary: {
-      main: green[ 200 ],
+      main: green[200],
     },
     secondary: {
-      main: brown[ 300 ],
+      main: brown[300],
     },
   },
 });
 
 function DashboardContent() {
-  const [ open, setOpen ] = React.useState(true);
+  const [open, setOpen] = React.useState(true);
   const { logoutUser } = React.useContext(AuthContext);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -90,7 +90,7 @@ function DashboardContent() {
 
   return (
     <ThemeProvider theme={ mdTheme }>
-      <Box sx={ { display: 'flex' } }>
+      <Box sx={ { display: 'flex', width: "100vw", height: "100vh" } }>
         <CssBaseline />
         { false ? null : <AppBar position="absolute" open={ open }>
           <Toolbar
@@ -130,7 +130,7 @@ function DashboardContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              px: [ 1 ],
+              px: [1],
             } }
           >
             <IconButton onClick={ toggleDrawer }>
@@ -145,15 +145,17 @@ function DashboardContent() {
           </List>
         </Drawer>
         <Box
-          component="main"
-          sx={ {
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          } }
+          flexDirection="column"
+          flexGrow={ 1 }
+          display="flex"
+          alignItems="stretch"
+          flexWrap="nowrap"
         >
           { false ? null : <Toolbar /> }
-          <Outlet />
+          <Box component={ Outlet }
+            sx={ {
+              flexGrow: 1,
+            } } />
         </Box>
       </Box>
     </ThemeProvider>
