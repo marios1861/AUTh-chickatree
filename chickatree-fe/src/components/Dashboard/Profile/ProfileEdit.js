@@ -186,6 +186,7 @@ export default function ProfileEdit({ items, apiClient, dispatch, user, logout }
           sx={ { textAlign: "center" } }
         >
           <Button
+            color="secondary"
             type="submit"
             variant="outlined">
             Save Changes

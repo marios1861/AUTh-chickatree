@@ -117,7 +117,7 @@ const Sidebar = ({ noteState, dispatch }) => {
                   <ListItemText
                     primaryTypographyProps={ { overflow: "hidden", noWrap: true, textOverflow: "ellipsis" } }
                     secondaryTypographyProps={ { fontSize: "0.7rem" } }
-                    primary={ note.title }
+                    primary={ note.title.slice(0, 32) }
                     secondary={ new Date(note.lastModified).toLocaleDateString("en-GB",
                       { hour: "2-digit", minute: "2-digit", }) }
                   />

@@ -73,10 +73,16 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const mdTheme = createTheme({
   palette: {
     primary: {
-      main: green[200],
+      main: "#81c784",
+      light: "#b2fab4",
+      dark: "#519657",
+      contrastText: "#fff"
     },
     secondary: {
-      main: brown[300],
+      main: "#a1887f",
+      dark: "#725b53",
+      light: "#d3b8ae",
+      contrastText: "#000"
     },
   },
 });
@@ -113,7 +119,7 @@ function DashboardContent() {
             <Typography
               component="h1"
               variant="h6"
-              color="inherit"
+              color="secondary.dark"
               noWrap
               sx={ { flexGrow: 1 } }
             >

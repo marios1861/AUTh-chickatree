@@ -146,6 +146,7 @@ const ProfileDetails = ({ items, dispatch }) => {
         xs={ 12 }
         sx={ { height: 80 } }>
         <Button
+          color="secondary"
           variant="outlined"
           onClick={ () => dispatch({ type: 'edit' }) }>
           Edit Profile

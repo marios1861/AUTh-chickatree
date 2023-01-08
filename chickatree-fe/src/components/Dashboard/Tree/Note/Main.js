@@ -1,4 +1,4 @@
-import { Paper, Typography, TextField } from "@mui/material";
+import { Paper, Typography, OutlinedInput, Box } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import ReactMarkdown from "react-markdown";
 
@@ -25,7 +25,7 @@ const Main = ({ activeNote, dispatch }) => {
     <Paper
       elevation={ 3 }
       sx={ {
-        p:2,
+        p: 2,
         flexGrow: 1,
         display: "flex",
         borderRadius: '30px',
@@ -37,23 +37,51 @@ const Main = ({ activeNote, dispatch }) => {
         xs={ 12 }
         flexWrap="nowrap"
         flexDirection="column"
-        alignItems="center"
+        alignItems="stretch"
         alignContent="stretch"
-        justifyContent="space-between">
-        <Grid>
-          <TextField label="Title" variant="outlined"
-            size="large"
-            multiline
-            maxRows={4}
-            value={ activeNote.title }
-            onChange={ (e) => onEditField("title", e.target.value) }
-            autoFocus />
+        justifyContent="flex-start">
+        <Grid container justifyContent="center">
+          <Grid xs={ 10 }>
+            <OutlinedInput placeholder="Title" variant="outlined"
+              multiline
+              maxRows={ 2 }
+              fullWidth
+              value={ activeNote.title }
+              onChange={ (e) => onEditField("title", e.target.value) }
+              autoFocus
+              sx={ {
+                backgroundColor: "#f8f8f8",
+              } } />
+          </Grid>
         </Grid>
-        <Grid>
-          <textarea
-            placeholder="Write your note here..."
-            value={ activeNote.body }
-            onChange={ (e) => onEditField("body", e.target.value) } />
+        <Grid container justifyContent="center" flex="1">
+          <Grid xs={ 12 }>
+            <Box
+              sx={ {
+                  p: 2,
+                  font: "inherit",
+                  resize: "none",
+                  overflow: "auto",
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "#f8f8f8",
+                  borderRadius: "4px",
+                  border: "2px solid #ccc",
+                  boxSizing: "border-box",
+                  "&:hover": {
+                    border: "1px",
+                    borderStyle:"solid",
+                    borderColor: "black"
+                  }
+                } }
+                rows="20"
+                placeholder="Write your note here..."
+                value={ activeNote.body }
+                onChange={ (e) => onEditField("body", e.target.value) }
+                component="textarea"
+            >
+            </Box>
+          </Grid>
         </Grid>
       </Grid>
     </Paper>

@@ -1,4 +1,5 @@
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import { Box } from '@mui/material';
 import { useReducer } from 'react';
 import uuid from 'react-uuid';
 import Main from './Note/Main';
@@ -58,13 +59,23 @@ export default function Note() {
   const [state, dispatch] = useReducer(reducer, { activeNoteId: false, list: [] });
 
   return (
-    <Grid container display="flex" spacing={ 3 } alignItems="stretch" sx={{m: 4, height: "100%"}} flexWrap="nowrap">
-      <Grid xs={ 4 } container sx={{m:0}}>
-        <Sidebar noteState={ state } dispatch={ dispatch } />
+    <Box sx={ { m: 4, height: "100%" } } >
+      <Grid
+        m={ 0 }
+        height="100%"
+        container
+        display="flex"
+        spacing={ 3 }
+        alignItems="stretch"
+        flexWrap="nowrap"
+        alignContent="stretch">
+        <Grid xs={ 4 } container sx={ { m: 0 } }>
+          <Sidebar noteState={ state } dispatch={ dispatch } />
+        </Grid>
+        <Grid xs={ 8 } container sx={ { m: 0 } }>
+          <Main activeNote={ state.list.find((note) => note.id === state.activeNoteId) } dispatch={ dispatch } />
+        </Grid>
       </Grid>
-      <Grid xs={ 8 } container sx={{m:0}}>
-        <Main activeNote={ state.list.find((note) => note.id === state.activeNoteId) } dispatch={ dispatch } />
-      </Grid>
-    </Grid>
+    </Box>
   );
 }
