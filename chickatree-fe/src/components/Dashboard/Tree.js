@@ -11,9 +11,9 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { Container } from '@mui/system';
 import * as React from 'react';
 import Note from './Tree/Note';
+import { Container } from '@mui/system';
 
 
 function reducer(state, action) {
@@ -35,14 +35,18 @@ function reducer(state, action) {
       return {
         trees: state.trees.filter((tree) => tree.id !== action.id),
       };
+    default: {
+      throw Error('Unknown tree action');
+    }
   }
 }
 
 function TreeItem({ tree, dispatch }) {
   return (
     <Card sx={ {
+      height: "100%",
       borderRadius: '30px',
-      flexGrow: 1, backgroundColor: tree.color || "#ffffff"
+      backgroundColor: tree.color || "#ffffff"
     } }>
       <CardMedia
         component="img"
@@ -97,34 +101,34 @@ export default function Tree() {
   );
 
   return (
-    <Box sx={ { m: 4, height: "100%" } }>
-      <Grid container spacing={ 4 } justifyContent="space-evenly">
-        <Grid
-          container
-          xs={ 2 }
-          alignItems="center"
-          justifyContent="center"
-          sx={ { width: 275, m: 0 } }>
-          <Tooltip title="Create new Tree" enterDelay={ 500 } leaveDelay={ 200 }>
-            <IconButton
-              onClick={ () => dispatch({ type: "create" }) }
-              size="small"
-              sx={ { color: "primary.dark" } }
-              aria-label="add to shopping cart">
-              <AddCircleOutlineIcon fontSize="large" />
-            </IconButton>
-          </Tooltip>
-        </Grid>
-        { state.trees.map((tree) => (
-          <Grid
-            container
-            xs={ 2 }
-            key={ tree.id }
-            sx={ { width: 275, height: 275, m: 0 } }>
-            <TreeItem tree={ tree } dispatch={ dispatch } />
-          </Grid>
-        )) }
+    <Grid container m={ 1 } spacing={ 4 } justifyContent="flex-start">
+      <Grid
+        container
+        xs={ 2 }
+        alignItems="center"
+        justifyContent="center"
+        sx={ { height: 275, m: 0, width: 275 } }>
+        <Tooltip title="Create new Tree" enterDelay={ 500 } leaveDelay={ 200 }>
+          <IconButton
+            onClick={ () => dispatch({ type: "create" }) }
+            size="small"
+            sx={ { color: "primary.dark" } }
+            aria-label="add to shopping cart">
+            <AddCircleOutlineIcon fontSize="large" />
+          </IconButton>
+        </Tooltip>
       </Grid>
-    </Box>
+      { state.trees.map((tree) => (
+        <Grid
+          xs={ 2 }
+          key={ tree.id }
+          sx={ {
+            height: 275,
+            width: 275,
+          } }>
+          <TreeItem tree={ tree } dispatch={ dispatch } />
+        </Grid>
+      )) }
+    </Grid>
   );
 }

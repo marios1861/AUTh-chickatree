@@ -1,8 +1,6 @@
 import * as React from 'react';
-import Grid from '@mui/material/Grid';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
-import { createTheme } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import AuthContext from '../AuthProvider';
@@ -10,14 +8,6 @@ import Button from '@mui/material/Button';
 import { Divider } from '@mui/material';
 import ProfileEdit from './Profile/ProfileEdit';
 import ProfileAvatar from './Profile/ProfileAvatar';
-
-const theme = createTheme({
-  palette: {
-    background: {
-      paper: '#c7f9cc',
-    }
-  },
-});
 
 function reducer(state, action) {
   switch (action.type) {

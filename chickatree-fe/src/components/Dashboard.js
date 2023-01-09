@@ -22,7 +22,6 @@ import Orders from './Dashboard/Orders';
 import AuthContext from './AuthProvider';
 import { Copyright } from './SignInSide';
 import { Outlet } from 'react-router-dom';
-import { green, brown } from '@mui/material/colors';
 
 const drawerWidth = 240;
 
@@ -151,17 +150,18 @@ function DashboardContent() {
           </List>
         </Drawer>
         <Box
-          flexDirection="column"
-          flexGrow={ 1 }
-          display="flex"
-          alignItems="stretch"
-          flexWrap="nowrap"
+          sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'light'
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
+            flexGrow: 1,
+            height: '100vh',
+            overflow: 'auto',
+          }}
         >
-          { false ? null : <Toolbar /> }
-          <Box component={ Outlet }
-            sx={ {
-              flexGrow: 1,
-            } } />
+          <Toolbar />
+          <Container height="100%" maxWidth="xl" sx={{ mt: 4, mb: 4 }} component={ Outlet }/>
         </Box>
       </Box>
     </ThemeProvider>
