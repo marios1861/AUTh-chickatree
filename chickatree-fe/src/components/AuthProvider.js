@@ -110,7 +110,9 @@ export const AuthProvider = ({ apiClient }) => {
           alert("Something went wrong!");
         }
       })
-      .catch((e) => setLoading(false));
+      .catch((e) => {
+        console.log(e)
+        setLoading(false)});
 
   };
 

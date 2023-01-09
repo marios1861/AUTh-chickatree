@@ -15,7 +15,7 @@ import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { MainListItems, secondaryListItems } from './Dashboard/listItems';
+import { MainListItems } from './Dashboard/listItems';
 import Chart from './Dashboard/Chart';
 import Deposits from './Dashboard/Deposits';
 import Orders from './Dashboard/Orders';
@@ -145,8 +145,6 @@ function DashboardContent() {
           <Divider />
           <List component="nav">
             <MainListItems />
-            <Divider sx={ { my: 1 } } />
-            { secondaryListItems }
           </List>
         </Drawer>
         <Box

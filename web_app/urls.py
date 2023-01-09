@@ -1,5 +1,4 @@
 from django.urls import path
-from django.contrib.staticfiles.urls import serve
 from .views import (
     RegistrationAPI,
     LoginAPI,
@@ -26,7 +25,6 @@ from .views import (
 
 
 urlpatterns = [
-    path("static/<path>", serve),
     path("register/", RegistrationAPI.as_view()),
     path("login/", LoginAPI.as_view()),
     path("user/<int:pk>/", UserAPI.as_view()),

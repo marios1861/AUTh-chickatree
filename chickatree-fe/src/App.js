@@ -5,7 +5,7 @@ createBrowserRouter
 } from "react-router-dom";
 import SignUp from './components/SignUp';
 import SignIn from './components/SignInSide';
-import Dashboard, { MainDashboard } from './components/Dashboard';
+import Dashboard from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
 import Profile from './components/Dashboard/Profile';
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <MainDashboard />,
+            element: <Tree />,
           },
           {
             path: "profile",

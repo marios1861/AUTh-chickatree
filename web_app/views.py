@@ -1,5 +1,6 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from knox.models import AuthToken
@@ -130,15 +131,16 @@ def profile_detail(request):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
-@permission_classes([IsAuthenticated])
+@api_view(["GET", "POST"])
+@permission_classes([])
+@parser_classes([MultiPartParser, FormParser])
 def trees_list(request):
     if request.method == "GET":
-        data = Tree.objects.get(user=request.user)
+        profile = Profile.objects.get(user=request.user)
+        data = profile.tree_set.all()
         serializer = TreeSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        request.data["user"] = request.user
         serializer = TreeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -148,6 +150,7 @@ def trees_list(request):
 
 
 @api_view(["PUT", "DELETE"])
+@parser_classes([MultiPartParser, FormParser])
 @permission_classes([IsAuthenticated])
 def tree_detail(request, pk):
     try:
@@ -168,7 +171,7 @@ def tree_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def notes_list(request):
     if request.method == "GET":
@@ -206,7 +209,7 @@ def note_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def published_trees_list(request):
     if request.method == "GET":
@@ -246,7 +249,7 @@ def published_tree_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def reviews_list(request):
     if request.method == "GET":
@@ -284,7 +287,7 @@ def review_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def changes_list(request):
     if request.method == "GET":
@@ -322,7 +325,7 @@ def change_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def bookmarks_list(request):
     if request.method == "GET":
@@ -360,7 +363,7 @@ def bookmark_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def comments_list(request):
     if request.method == "GET":
@@ -398,7 +401,7 @@ def comment_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST "])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def multimedia_list(request):
     if request.method == "GET":

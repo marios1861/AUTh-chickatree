@@ -7,8 +7,7 @@ from django_mysql.models import SizedTextField, EnumField
 
 # Create your models here.
 class Profile(models.Model):
-    id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     date_of_birth = models.DateField(null=True)
 
     class Genders(models.TextChoices):
@@ -37,12 +36,16 @@ def user_is_created(sender, instance, created, **kwargs):
         instance.profile.save()
 
 
+def upload_to(instance, filename):
+    return "images/{filename}".format(filename=filename)
+
+
 class Tree(models.Model):
     id = models.AutoField(primary_key=True)
     title = SizedTextField(1)
 
     owner = models.ForeignKey("Profile", on_delete=models.CASCADE)
-    image = SizedTextField(1)
+    image = models.ImageField(upload_to=upload_to, blank=True, null=True)
     color = models.PositiveIntegerField()
 
     def __str__(self):
@@ -109,7 +112,7 @@ class Review(models.Model):
             models.UniqueConstraint(
                 fields=["author", "published_tree_id"], name="review_pk"
             ),
-            models.CheckConstraint(check=models.Q(rating__lte=5), name='rating_lte_5')
+            models.CheckConstraint(check=models.Q(rating__lte=5), name="rating_lte_5"),
         ]
 
     def __str__(self):
@@ -119,9 +122,7 @@ class Review(models.Model):
 class Change(models.Model):
     id = models.AutoField(primary_key=True)
     note_id = models.ForeignKey(Note, on_delete=models.CASCADE)
-    author = models.ForeignKey(
-        Profile, on_delete=models.SET_DEFAULT, default=-1
-    )
+    author = models.ForeignKey(Profile, on_delete=models.SET_DEFAULT, default=-1)
     difference = SizedTextField(3)
     time = models.DateTimeField(auto_now_add=True)
     message = SizedTextField(1)
