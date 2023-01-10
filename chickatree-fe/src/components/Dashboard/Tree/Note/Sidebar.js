@@ -2,8 +2,10 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import NotesIcon from '@mui/icons-material/NotesOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import dayjs from "dayjs";
 import {
   Avatar,
   TextField,
@@ -18,7 +20,7 @@ import {
   Paper
 } from '@mui/material';
 
-const Sidebar = ({ noteState, dispatch }) => {
+const Sidebar = ({ tree, apiClient, noteState, dispatch, treeDispatch }) => {
   const [input, setInput] = useState("");
   const [filterednotes, setFilteredNotes] = useState([]);
 
@@ -37,6 +39,26 @@ const Sidebar = ({ noteState, dispatch }) => {
   };
 
   const currentActiveNotes = input ? filterednotes : noteState.list;
+
+  const handleAdd = () => {
+    apiClient
+    .post(`api/notes/${tree.id}/`)
+    .then(() => {
+      dispatch({ type: "requestRefresh" })
+    })
+    .catch((err) => console.log(err));
+  };
+
+  const handleDelete = (noteId) => {
+    dispatch({type:"delete", id: noteId})
+    apiClient
+    .delete(`api/note/${noteId}/`)
+    .then(() => {
+      dispatch({ type: "requestRefresh" })
+    })
+    .catch((err) => console.log(err));
+  };
+
 
   return (
     <Paper
@@ -60,10 +82,19 @@ const Sidebar = ({ noteState, dispatch }) => {
           <Grid>
             <Typography variant='h5'>Notes</Typography>
           </Grid>
-          <Grid container xs={ 2 } justifyContent="center" alignItems="center">
+          <Grid container xs={ 3 } flexWrap="nowrap" justifyContent="center" alignItems="center">
             <IconButton color="secondary"
-              onClick={ () => dispatch({ type: "add" }) }>
+              onClick={ handleAdd }>
               <AddIcon
+                sx={ {
+                  height: 40,
+                  width: 40
+                } }
+                color="secondary" />
+            </IconButton>
+            <IconButton color="secondary"
+              onClick={ () => treeDispatch({ type: "close" }) }>
+              <CloseIcon
                 sx={ {
                   height: 40,
                   width: 40
@@ -100,7 +131,7 @@ const Sidebar = ({ noteState, dispatch }) => {
                     sx={ { color: 'secondary.main' } }
                     edge="end"
                     aria-label="delete"
-                    onClick={ () => dispatch({ type: "delete", id: note.id }) }>
+                    onClick={ () => handleDelete(note.id) }>
                     <DeleteIcon
                     />
                   </IconButton>
@@ -116,7 +147,7 @@ const Sidebar = ({ noteState, dispatch }) => {
                     primaryTypographyProps={ { overflow: "hidden", noWrap: true, textOverflow: "ellipsis" } }
                     secondaryTypographyProps={ { fontSize: "0.7rem" } }
                     primary={ note.title.slice(0, 32) }
-                    secondary={ new Date(note.lastModified).toLocaleDateString("en-GB",
+                    secondary={ new Date(dayjs(note.lastModified)).toLocaleDateString("en-GB",
                       { hour: "2-digit", minute: "2-digit", }) }
                   />
                 </ListItemButton>

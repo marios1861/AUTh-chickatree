@@ -56,15 +56,14 @@ class Note(models.Model):
     id = models.AutoField(primary_key=True)
     tree_id = models.ForeignKey("Tree", on_delete=models.CASCADE)
     parent_id = models.ForeignKey(
-        "self", on_delete=models.CASCADE, related_name="child_id"
-    )
+        "self", on_delete=models.CASCADE, related_name="child_id", null=True)
     title = SizedTextField(1)
     time_created = models.DateTimeField(auto_now_add=True)
     time_modified = models.DateTimeField(auto_now=True)
-    time_viewed = models.DateTimeField()
+    time_viewed = models.DateTimeField(auto_now=True)
     locked = models.BooleanField(default=True)
     hidden = models.BooleanField(default=True)
-    image = SizedTextField(1)
+    image = models.ImageField(upload_to=upload_to, blank=True, null=True)
     color = models.PositiveIntegerField()
     markdown_text = SizedTextField(3)
 

@@ -1,81 +1,94 @@
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
-import { Box } from '@mui/material';
-import { useReducer } from 'react';
-import uuid from 'react-uuid';
+import { useReducer, useEffect } from 'react';
 import Main from './Note/Main';
 import Sidebar from './Note/Sidebar';
 
 
 function reducer(state, action) {
   switch (action.type) {
-    case "add":
+    case "requestRefresh":
       return {
-        list: [newNote(), ...state.list],
-        activeNoteId: state.activeNoteId
-
+        list: state.list,
+        activeNoteId: state.activeNoteId,
+        refresh: true
       };
-
-    case "update": {
+    case "finishRefresh":
       return {
-        list:
-          state
-            .list
-            .filter((note) => note.id !== state.activeNoteId)
-            .concat([action.updatedNote]),
-        activeNoteId: state.activeNoteId
-
+        list: action.data,
+        activeNoteId: state.activeNoteId,
+        refresh: false
       };
-    }
 
     case "delete":
       return {
         list: state.list.filter((note) => note.id !== action.id),
-        activeNoteId: state.activeNoteId
+        activeNoteId: state.activeNoteId,
+        refresh: state.refresh
       };
 
     case "activate": {
       return {
         list: state.list,
-        activeNoteId: action.id
+        activeNoteId: action.id,
+        refresh: state.refresh
       };
     }
+
+    case "deactivate": {
+      return {
+        list: state.list,
+        activeNoteId: null,
+        refresh: state.refresh
+      };
+    }
+
     default: {
-      throw Error('Unknown profile action');
+      throw Error('Unknown Note action');
     }
   }
 }
 
+export default function Note({ tree, dispatch: treeDispatch, apiClient }) {
+  const [state, dispatch] = useReducer(
+    reducer,
+    { activeNoteId: null, list: [], refresh: true },
+  );
 
-const newNote = () => {
-  return {
-    id: uuid(),
-    title: "",
-    body: "",
-    lastModified: Date.now()
-  };
-};
-
-export default function Note() {
-  const [state, dispatch] = useReducer(reducer, { activeNoteId: false, list: [] });
+  useEffect(() => {
+    if (state.refresh) {
+      apiClient
+        .get(`api/notes/${tree.id}/`)
+        .then((response) => {
+          dispatch({ type: 'finishRefresh', data: response.data });
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [state.refresh, tree.id, apiClient]);
 
   return (
-    <Box sx={ { m: 4, height: "100%" } } >
-      <Grid
-        m={ 0 }
-        height="100%"
-        container
-        display="flex"
-        spacing={ 3 }
-        alignItems="stretch"
-        flexWrap="nowrap"
-        alignContent="stretch">
-        <Grid xs={ 4 } container sx={ { m: 0 } }>
-          <Sidebar noteState={ state } dispatch={ dispatch } />
-        </Grid>
-        <Grid xs={ 8 } container sx={ { m: 0 } }>
-          <Main activeNote={ state.list.find((note) => note.id === state.activeNoteId) } dispatch={ dispatch } />
-        </Grid>
+    <Grid
+      m={ 0 }
+      height="100%"
+      container
+      display="flex"
+      spacing={ 3 }
+      alignItems="stretch"
+      flexWrap="nowrap"
+      alignContent="stretch">
+      <Grid xs={ 4 } container sx={ { m: 0 } }>
+        <Sidebar
+          tree={ tree }
+          apiClient={ apiClient }
+          noteState={ state }
+          dispatch={ dispatch }
+          treeDispatch={ treeDispatch } />
       </Grid>
-    </Box>
+      <Grid xs={ 8 } container sx={ { m: 0 } }>
+        <Main
+          apiClient={ apiClient }
+          activeNote={ state.list.find((note) => note.id === state.activeNoteId) }
+          dispatch={ dispatch } />
+      </Grid>
+    </Grid>
   );
 }

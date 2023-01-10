@@ -101,6 +101,11 @@ class NoteSerializer(serializers.ModelSerializer):
             "bookmarks",
             "comments",
         ]
+        extra_kwargs = {
+            "references": {"required": False, "allow_empty": True},
+            "markdown_text": {"required": False},
+            "title": {"required": False},
+        }
 
 
 class PublishedTreeSerializer(serializers.ModelSerializer):

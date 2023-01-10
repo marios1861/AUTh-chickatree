@@ -173,14 +173,16 @@ def tree_detail(request, pk):
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def notes_list(request):
+def notes_list(request, tree_pk):
     if request.method == "GET":
-        data = Note.objects.get(user=request.user)
+        tree = Tree.objects.get(id=tree_pk)
+        data = tree.note_set.all()
         serializer = NoteSerializer(data, context={"request": request}, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
         request.data["user"] = request.user
-        serializer = NoteSerializer(data=request.data)
+        new_note = {"tree_id": tree_pk, "color": 16777215}
+        serializer = NoteSerializer(data=new_note)
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)

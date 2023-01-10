@@ -8,3 +8,4 @@ knox
 cryptography
 jinja2
 Pillow
+python-decouple

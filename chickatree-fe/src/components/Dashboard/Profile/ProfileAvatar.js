@@ -1,5 +1,4 @@
 import { Unstable_Grid2 as Grid, Typography, Avatar } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
 import * as React from 'react';
 
 export default function ProfileAvatar({ image, user }) {

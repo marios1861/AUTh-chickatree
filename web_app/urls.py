@@ -32,7 +32,7 @@ urlpatterns = [
     path("profile/update/", profile_detail),
     path("tree/", trees_list),
     path("tree/<int:pk>/", tree_detail),
-    path("note/", notes_list),
+    path("notes/<int:tree_pk>/", notes_list),
     path("note/<int:pk>/", note_detail),
     path("published_tree/", published_trees_list),
     path("published_tree/<int:pk>/", published_tree_detail),

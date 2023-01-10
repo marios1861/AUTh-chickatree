@@ -31,6 +31,20 @@ const newTree = () => (
 
 function reducer(state, action) {
   switch (action.type) {
+    case "open":
+      return {
+        trees: state.trees,
+        createDialog: state.update,
+        update: state.update,
+        openId: action.id
+      };
+    case "close":
+      return {
+        trees: state.trees,
+        createDialog: state.update,
+        update: state.update,
+        openId: null
+      };
     case "create":
       return {
         trees: state.trees,
@@ -46,7 +60,6 @@ function reducer(state, action) {
         openId: state.openId
       };
     case "finishUpdate":
-      console.log(action.data, "heyy");
       return {
         trees: action.data
           .map((tree) => ({ ...tree, color: "#".concat(tree.color.toString(16)) })) || [],
@@ -69,10 +82,9 @@ function reducer(state, action) {
         openId: state.openId
       };
     case "delete":
-      console.log(action.id)
       return {
         trees: state.trees.filter((tree) => tree.id !== action.id),
-        createDialog: action.id === null ? false : state.createDialog ,
+        createDialog: action.id === null ? false : state.createDialog,
         update: state.update,
         openId: state.openId,
       };
@@ -86,7 +98,7 @@ function reducer(state, action) {
 function TreeEditItem({ tree, dispatch }) {
   const { user, apiClient } = React.useContext(AuthContext);
 
-  const handleDelete = () => {  
+  const handleDelete = () => {
     if (tree.id) {
       apiClient
         .delete(`api/tree/${tree.id}/`)
@@ -94,7 +106,7 @@ function TreeEditItem({ tree, dispatch }) {
         .catch((err) => console.log(err));
     }
     else {
-      dispatch({type: "delete", id: tree.id})
+      dispatch({ type: "delete", id: tree.id });
     }
   };
   const handleSave = (event) => {
@@ -212,7 +224,12 @@ function TreeItem({ tree, dispatch }) {
       </CardContent>
       <CardActions>
         <Box sx={ { display: "flex", justifyContent: "space-evenly", width: "100%" } }>
-          <Button sx={ { color: "secondary.dark" } } size="small">Open</Button>
+          <Button
+            onClick={ () => setTimeout(() => dispatch({ type: 'open', id: tree.id }), 200) }
+            sx={ { color: "secondary.dark" } }
+            size="small">
+            Open
+          </Button>
           <Button sx={ { color: "secondary.dark" } } size="small">Share</Button>
           <Button
             onClick={ () => setTimeout(() => dispatch({ type: 'edit', id: tree.id }), 200) }
@@ -232,7 +249,8 @@ export default function Tree() {
     {
       trees: [],
       createDialog: false,
-      update: true
+      update: true,
+      openId: null
     },
   );
 
@@ -241,48 +259,57 @@ export default function Tree() {
       apiClient
         .get('api/tree/')
         .then((response) => {
-          console.log(response);
           dispatch({ type: 'finishUpdate', data: response.data });
         })
         .catch((err) => console.log(err));
     }
   }, [state.update, apiClient]);
-
-  return (
-    <Grid container m={ 1 } spacing={ 4 } justifyContent="flex-start" columnGap={ 0 }>
-      <Grid
-        container
-        xs={ 2 }
-        alignItems="center"
-        justifyContent="center"
-        sx={ { height: 275, m: 0, width: 275 } }>
-        { state.createDialog
-          ? <TreeEditItem tree={ newTree() } dispatch={ dispatch } />
-          : <Tooltip title="Create new Tree" enterDelay={ 500 } leaveDelay={ 200 }>
-            <IconButton
-              onClick={ () => dispatch({ type: "create" }) }
-              size="small"
-              sx={ { color: "primary.dark" } }>
-              <AddCircleOutlineIcon fontSize="large" />
-            </IconButton>
-          </Tooltip>
-        }
+  if (state.openId) {
+    return (
+      <Note
+        tree={ state.trees.find((tree) => tree.id === state.openId) }
+        dispatch={ dispatch }
+        apiClient={ apiClient }
+      />
+    );
+  }
+  else {
+    return (
+      <Grid container m={ 1 } spacing={ 4 } justifyContent="flex-start" columnGap={ 0 }>
+        <Grid
+          container
+          xs={ 2 }
+          alignItems="center"
+          justifyContent="center"
+          sx={ { height: 275, m: 0, width: 275 } }>
+          { state.createDialog
+            ? <TreeEditItem tree={ newTree() } dispatch={ dispatch } />
+            : <Tooltip title="Create new Tree" enterDelay={ 500 } leaveDelay={ 200 }>
+              <IconButton
+                onClick={ () => dispatch({ type: "create" }) }
+                size="small"
+                sx={ { color: "primary.dark" } }>
+                <AddCircleOutlineIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+          }
+        </Grid>
+        { state.trees
+          ? state.trees.map((tree) => (
+            <Grid
+              xs={ 2 }
+              key={ tree.id }
+              sx={ {
+                height: 275,
+                width: 275,
+              } }>
+              { tree.edit
+                ? <TreeEditItem tree={ tree } dispatch={ dispatch } />
+                : <TreeItem tree={ tree } dispatch={ dispatch } /> }
+            </Grid>
+          ))
+          : null }
       </Grid>
-      { state.trees
-        ? state.trees.map((tree) => (
-          <Grid
-            xs={ 2 }
-            key={ tree.id }
-            sx={ {
-              height: 275,
-              width: 275,
-            } }>
-            { tree.edit
-              ? <TreeEditItem tree={ tree } dispatch={ dispatch } />
-              : <TreeItem tree={ tree } dispatch={ dispatch } /> }
-          </Grid>
-        ))
-        : null }
-    </Grid>
-  );
+    );
+  }
 }

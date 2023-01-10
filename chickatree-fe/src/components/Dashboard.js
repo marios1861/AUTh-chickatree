@@ -156,10 +156,10 @@ function DashboardContent() {
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
+            pt: 8
           }}
         >
-          <Toolbar />
-          <Container height="100%" maxWidth="xl" sx={{ mt: 4, mb: 4 }} component={ Outlet }/>
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }} component={ Outlet }/>
         </Box>
       </Box>
     </ThemeProvider>
